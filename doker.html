@@ -1,0 +1,1715 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bug Bounty Dork Launcher</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Cascadia+Code:wght@400;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cascadia Code', 'Courier New', monospace;
+            background: #fff;
+            color: #000;
+            min-height: 100vh;
+            padding: 40px 20px;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        header {
+            border-bottom: 2px solid #000;
+            padding-bottom: 30px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5em;
+            font-weight: 600;
+            letter-spacing: -1px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #333;
+            font-size: 1em;
+            font-weight: 400;
+        }
+
+        .input-section {
+            background: #fff;
+            border: 2px solid #000;
+            padding: 30px;
+            margin-bottom: 40px;
+        }
+
+        .warning {
+            background: #f5f5f5;
+            border-left: 3px solid #000;
+            padding: 15px 20px;
+            margin-bottom: 25px;
+            font-size: 0.9em;
+            color: #000;
+        }
+
+        .input-group {
+            margin-bottom: 25px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 15px;
+            background: #fff;
+            border: 2px solid #000;
+            color: #000;
+            font-size: 1em;
+            font-family: 'Cascadia Code', monospace;
+            transition: all 0.3s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            background: #f5f5f5;
+        }
+
+        input[type="text"]::placeholder {
+            color: #999;
+        }
+
+        .engine-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .engine-btn {
+            padding: 12px;
+            background: #fff;
+            border: 2px solid #000;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85em;
+            font-weight: 400;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .engine-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .engine-btn.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 2px;
+            background: #000;
+            border: 2px solid #000;
+        }
+
+        .stat-item {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .stat-number {
+            display: block;
+            font-size: 2em;
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 0.8em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .section-nav {
+            display: flex;
+            gap: 2px;
+            background: #000;
+            border: 2px solid #000;
+            margin-bottom: 40px;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 15px;
+            background: #fff;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Cascadia Code', monospace;
+            font-weight: 600;
+        }
+
+        .nav-btn:hover {
+            background: #f0f0f0;
+        }
+
+        .nav-btn.active {
+            background: #000;
+            color: #fff;
+        }
+
+        .dork-section {
+            margin-bottom: 60px;
+            display: none;
+        }
+
+        .dork-section.active {
+            display: block;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #000;
+        }
+
+        .section-title {
+            font-size: 1.8em;
+            font-weight: 600;
+        }
+
+        .section-count {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .dorks-list {
+            display: grid;
+            gap: 2px;
+            background: #000;
+            border: 2px solid #000;
+        }
+
+        .dork-item {
+            background: #fff;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-left: 3px solid #fff;
+        }
+
+        .dork-item:hover {
+            background: #f5f5f5;
+            border-left-color: #000;
+        }
+
+        .dork-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .dork-name {
+            font-weight: 600;
+            font-size: 1em;
+            color: #000;
+        }
+
+        .dork-category {
+            font-size: 0.75em;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid #000;
+            padding: 2px 8px;
+        }
+
+        .dork-description {
+            font-size: 0.85em;
+            color: #333;
+            margin-bottom: 12px;
+        }
+
+        .dork-query {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            padding: 10px 12px;
+            font-family: 'Cascadia Code', monospace;
+            font-size: 0.8em;
+            color: #000;
+            word-break: break-all;
+        }
+
+        .action-bar {
+            display: flex;
+            gap: 2px;
+            background: #000;
+            border: 2px solid #000;
+            margin-top: 20px;
+        }
+
+        .action-btn {
+            flex: 1;
+            padding: 15px;
+            background: #fff;
+            border: none;
+            color: #000;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.9em;
+            font-family: 'Cascadia Code', monospace;
+            font-weight: 600;
+        }
+
+        .action-btn:hover {
+            background: #000;
+            color: #fff;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #000;
+            color: #fff;
+            padding: 2px 8px;
+            font-size: 0.7em;
+            font-weight: 600;
+            margin-left: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        footer {
+            margin-top: 80px;
+            padding-top: 30px;
+            border-top: 2px solid #000;
+            text-align: center;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .engine-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .section-nav {
+                flex-wrap: wrap;
+            }
+
+            .nav-btn {
+                font-size: 0.75em;
+                padding: 12px 8px;
+            }
+        }
+
+        .info-box {
+            background: #f5f5f5;
+            border: 2px solid #000;
+            padding: 20px;
+            margin-bottom: 20px;
+            font-size: 0.9em;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 1.1em;
+        }
+
+        .category-filter {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .filter-chip {
+            padding: 6px 12px;
+            background: #fff;
+            border: 1px solid #000;
+            color: #000;
+            font-size: 0.75em;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Cascadia Code', monospace;
+        }
+
+        .filter-chip:hover,
+        .filter-chip.active {
+            background: #000;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Bug Bounty Dork Launcher</h1>
+            <p class="subtitle">Comprehensive OSINT & Reconnaissance Tool</p>
+        </header>
+
+        <div class="input-section">
+            <div class="warning">
+                ⚠ Use Carefuly ⚠
+            </div>
+
+            <div class="input-group">
+                <input type="text" id="targetDomain" placeholder="target.com" />
+            </div>
+
+            <div class="engine-grid">
+                <button class="engine-btn active" data-engine="google">Google</button>
+                <button class="engine-btn" data-engine="bing">Bing</button>
+                <button class="engine-btn" data-engine="duckduckgo">DuckDuckGo</button>
+                <button class="engine-btn" data-engine="yahoo">Yahoo</button>
+                <button class="engine-btn" data-engine="yandex">Yandex</button>
+                <button class="engine-btn" data-engine="baidu">Baidu</button>
+                <button class="engine-btn" data-engine="brave">Brave</button>
+                <button class="engine-btn" data-engine="startpage">Startpage</button>
+                <button class="engine-btn" data-engine="qwant">Qwant</button>
+                <button class="engine-btn" data-engine="ecosia">Ecosia</button>
+                <button class="engine-btn" data-engine="ask">Ask</button>
+                <button class="engine-btn" data-engine="searx">SearX</button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-number" id="totalDorks">0</span>
+                    <span class="stat-label">Total</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="reconCount">0</span>
+                    <span class="stat-label">Recon</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="ezCount">0</span>
+                    <span class="stat-label">Easy</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="intCount">0</span>
+                    <span class="stat-label">Intermediate</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="advCount">0</span>
+                    <span class="stat-label">Advanced</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="ghdbCount">0</span>
+                    <span class="stat-label">GHDB</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-nav" id="sectionNav"></div>
+
+        <div id="dorksContainer"></div>
+
+        <footer>
+            <p>Bug Bounty Dork Launcher v3.0 | Use Responsibly | Always Get Permission</p>
+        </footer>
+    </div>
+
+    <script>
+        const dorks = {
+            recon: [
+                {
+                    name: "URL Parameters Discovery",
+                    description: "Find URLs with query parameters for testing",
+                    query: 'site:{DOMAIN} inurl:? | inurl:= | inurl:& | inurl:%',
+                    category: "Parameters"
+                },
+                {
+                    name: "Common Parameter Names",
+                    description: "URLs with common vulnerable parameters",
+                    query: 'site:{DOMAIN} inurl:id= | inurl:user= | inurl:page= | inurl:file=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Search Parameters",
+                    description: "Search and query parameter endpoints",
+                    query: 'site:{DOMAIN} inurl:search= | inurl:query= | inurl:q= | inurl:keyword=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Redirect Parameters",
+                    description: "Potential open redirect parameters",
+                    query: 'site:{DOMAIN} inurl:redirect= | inurl:url= | inurl:return= | inurl:next= | inurl:goto= | inurl:r= | inurl:callback= | inurl:redirecturi=' ,
+                    category: "Parameters"
+                },
+                {
+                    name: "Callback Parameters",
+                    description: "Callback and JSONP endpoints",
+                    query: 'site:{DOMAIN} inurl:callback= | inurl:jsonp= | inurl:cb=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Path Traversal Params",
+                    description: "File and path related parameters",
+                    query: 'site:{DOMAIN} inurl:path= | inurl:folder= | inurl:dir= | inurl:file= | inurl:document=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Include Parameters",
+                    description: "Inclusion vulnerable parameters",
+                    query: 'site:{DOMAIN} inurl:include= | inurl:require= | inurl:load= | inurl:module=',
+                    category: "Parameters"
+                },
+                {
+                    name: "JavaScript Files",
+                    description: "JS files that may contain endpoints and parameters",
+                    query: 'site:{DOMAIN} ext:js | ext:javascript',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "JS with API Endpoints",
+                    description: "JavaScript files mentioning API paths",
+                    query: 'site:{DOMAIN} ext:js intext:"/api/" | intext:"endpoint" | intext:"route"',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Config in JS",
+                    description: "Configuration and endpoints in JavaScript",
+                    query: 'site:{DOMAIN} ext:js intext:"baseURL" | intext:"apiURL" | intext:"API_URL"',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "JSON Files",
+                    description: "JSON configuration and data files",
+                    query: 'site:{DOMAIN} ext:json',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Package.json",
+                    description: "Node.js package files with dependencies",
+                    query: 'site:{DOMAIN} inurl:package.json | inurl:package-lock.json',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Composer.json",
+                    description: "PHP Composer dependency files",
+                    query: 'site:{DOMAIN} inurl:composer.json | inurl:composer.lock',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "API Versioning",
+                    description: "API version endpoints",
+                    query: 'site:{DOMAIN} inurl:/api/v1/ | inurl:/api/v2/ | inurl:/api/v3/ | inurl:/v1/ | inurl:/v2/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "REST API Paths",
+                    description: "RESTful API endpoint patterns",
+                    query: 'site:{DOMAIN} inurl:/api/ | inurl:/rest/ | inurl:/service/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Admin Paths",
+                    description: "Administrative path discovery",
+                    query: 'site:{DOMAIN} inurl:/admin/ | inurl:/administrator/ | inurl:/panel/ | inurl:/dashboard/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "User Profile Paths",
+                    description: "User and profile endpoints",
+                    query: 'site:{DOMAIN} inurl:/user/ | inurl:/users/ | inurl:/profile/ | inurl:/account/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Upload Paths",
+                    description: "File upload endpoints and directories",
+                    query: 'site:{DOMAIN} inurl:/upload/ | inurl:/uploads/ | inurl:/media/ | inurl:/files/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Download Paths",
+                    description: "File download endpoints",
+                    query: 'site:{DOMAIN} inurl:/download/ | inurl:/downloads/ | inurl:/get/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "AJAX Endpoints",
+                    description: "AJAX and asynchronous request paths",
+                    query: 'site:{DOMAIN} inurl:/ajax/ | inurl:/xhr/ | inurl:/async/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Sitemap Files",
+                    description: "XML sitemaps revealing site structure",
+                    query: 'site:{DOMAIN} inurl:sitemap.xml | inurl:sitemap_index.xml',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Robots.txt",
+                    description: "Robots file revealing hidden paths",
+                    query: 'site:{DOMAIN} inurl:robots.txt',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Security.txt",
+                    description: "Security policy and contact information",
+                    query: 'site:{DOMAIN} inurl:security.txt | inurl:.well-known/security.txt',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Humans.txt",
+                    description: "Information about site creators",
+                    query: 'site:{DOMAIN} inurl:humans.txt',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Webpack Assets",
+                    description: "Webpack bundle files",
+                    query: 'site:{DOMAIN} inurl:webpack | inurl:bundle.js | inurl:vendor.js',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Source Maps",
+                    description: "JavaScript source map files",
+                    query: 'site:{DOMAIN} ext:map inurl:.js.map',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "GraphQL Schema",
+                    description: "GraphQL introspection and schema",
+                    query: 'site:{DOMAIN} inurl:graphql intext:"query" | inurl:graphiql',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Swagger Paths",
+                    description: "API documentation revealing all endpoints",
+                    query: 'site:{DOMAIN} inurl:/swagger/ | inurl:/swagger-ui/ | inurl:/api-docs/',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "OpenAPI Spec",
+                    description: "OpenAPI specification files",
+                    query: 'site:{DOMAIN} inurl:openapi.json | inurl:openapi.yaml | inurl:swagger.json',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "WADL Files",
+                    description: "Web Application Description Language files",
+                    query: 'site:{DOMAIN} ext:wadl | inurl:application.wadl',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Postman Collections",
+                    description: "Postman API collection files",
+                    query: 'site:{DOMAIN} inurl:postman | ext:json "postman"',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Subdomains in URLs",
+                    description: "Discover subdomains mentioned in pages",
+                    query: 'site:{DOMAIN} intext:"://*.{DOMAIN}"',
+                    category: "Subdomain"
+                },
+                {
+                    name: "Internal Links",
+                    description: "Internal linking structure",
+                    query: 'site:{DOMAIN} inanchor:"{DOMAIN}"',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Backlinks",
+                    description: "External sites linking to target",
+                    query: 'link:{DOMAIN}',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Cached Pages",
+                    description: "Google cached versions",
+                    query: 'cache:{DOMAIN}',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Related Sites",
+                    description: "Similar websites",
+                    query: 'related:{DOMAIN}',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Email Addresses",
+                    description: "Email addresses on domain",
+                    query: 'site:{DOMAIN} intext:"@{DOMAIN}" | intext:"email"',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Phone Numbers",
+                    description: "Contact phone numbers",
+                    query: 'site:{DOMAIN} intext:"phone" | intext:"tel:" | intext:"call"',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Social Media Links",
+                    description: "Social media profiles",
+                    query: 'site:{DOMAIN} intext:"facebook" | intext:"twitter" | intext:"linkedin" | intext:"instagram"',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "Technology Stack",
+                    description: "Technologies mentioned in pages",
+                    query: 'site:{DOMAIN} intext:"powered by" | intext:"built with" | intext:"running on"',
+                    category: "Info-Gathering"
+                },
+                {
+                    name: "CDN URLs",
+                    description: "CDN and static asset URLs",
+                    query: 'site:{DOMAIN} inurl:cdn | inurl:static | inurl:assets',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Test Environments",
+                    description: "Test, dev, and staging environments",
+                    query: 'site:{DOMAIN} inurl:test | inurl:dev | inurl:staging | inurl:uat | inurl:demo',
+                    category: "Subdomain"
+                },
+                {
+                    name: "API Keys in URLs",
+                    description: "Potential API keys in URL parameters",
+                    query: 'site:{DOMAIN} inurl:key= | inurl:api= | inurl:token= | inurl:secret=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Debug Parameters",
+                    description: "Debug and development parameters",
+                    query: 'site:{DOMAIN} inurl:debug= | inurl:test= | inurl:dev= | inurl:trace=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Language Parameters",
+                    description: "Language and locale parameters",
+                    query: 'site:{DOMAIN} inurl:lang= | inurl:language= | inurl:locale= | inurl:region=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Pagination Parameters",
+                    description: "Pagination and sorting parameters",
+                    query: 'site:{DOMAIN} inurl:page= | inurl:offset= | inurl:limit= | inurl:sort= | inurl:order=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Filter Parameters",
+                    description: "Filtering and category parameters",
+                    query: 'site:{DOMAIN} inurl:filter= | inurl:category= | inurl:tag= | inurl:type=',
+                    category: "Parameters"
+                },
+                {
+                    name: "Authentication Paths",
+                    description: "Auth-related endpoints",
+                    query: 'site:{DOMAIN} inurl:/login | inurl:/logout | inurl:/signin | inurl:/signout | inurl:/auth',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Registration Paths",
+                    description: "User registration endpoints",
+                    query: 'site:{DOMAIN} inurl:/register | inurl:/signup | inurl:/join | inurl:/create-account',
+                    category: "Path-Discovery"
+                },
+                {
+                    name: "Password Reset Paths",
+                    description: "Password recovery endpoints",
+                    query: 'site:{DOMAIN} inurl:/forgot | inurl:/reset | inurl:/recover | inurl:/password-reset',
+                    category: "Path-Discovery"
+                }
+            ],
+            ez: [
+                {
+                    name: "Directory Listing",
+                    description: "Exposed directories showing file structure",
+                    query: 'site:{DOMAIN} intitle:"index of"',
+                    category: "Exposure"
+                },
+                {
+                    name: "Backup Files",
+                    description: "Common backup file extensions",
+                    query: 'site:{DOMAIN} ext:bkf | ext:bkp | ext:bak | ext:old | ext:backup',
+                    category: "Files"
+                },
+                {
+                    name: "SQL Database Files",
+                    description: "Exposed SQL dumps and database files",
+                    query: 'site:{DOMAIN} ext:sql | ext:db | ext:dbf | ext:mdb',
+                    category: "Database"
+                },
+                {
+                    name: "Log Files",
+                    description: "Application and server log files",
+                    query: 'site:{DOMAIN} ext:log | ext:logs',
+                    category: "Files"
+                },
+                {
+                    name: "Configuration Files",
+                    description: "Config files that may contain sensitive data",
+                    query: 'site:{DOMAIN} ext:conf | ext:config | ext:cfg | ext:ini',
+                    category: "Config"
+                },
+                {
+                    name: "Login Pages",
+                    description: "Authentication endpoints",
+                    query: 'site:{DOMAIN} inurl:login | inurl:signin | inurl:auth | inurl:authenticate',
+                    category: "Auth"
+                },
+                {
+                    name: "Admin Panels",
+                    description: "Administrative interfaces",
+                    query: 'site:{DOMAIN} inurl:admin | inurl:administrator | inurl:wp-admin | inurl:dashboard',
+                    category: "Admin"
+                },
+                {
+                    name: "Upload Functionality",
+                    description: "File upload endpoints",
+                    query: 'site:{DOMAIN} inurl:upload | inurl:uploads | inurl:uploader | inurl:file-upload',
+                    category: "Functions"
+                },
+                {
+                    name: "PHP Info Disclosure",
+                    description: "phpinfo() pages revealing server configuration",
+                    query: 'site:{DOMAIN} inurl:phpinfo.php | inurl:info.php | ext:php intitle:phpinfo',
+                    category: "Disclosure"
+                },
+                {
+                    name: "Text Documents",
+                    description: "Text files and documents",
+                    query: 'site:{DOMAIN} ext:txt | ext:doc | ext:docx | ext:odt',
+                    category: "Files"
+                },
+                {
+                    name: "Spreadsheets",
+                    description: "Excel and spreadsheet files",
+                    query: 'site:{DOMAIN} ext:xls | ext:xlsx | ext:csv',
+                    category: "Files"
+                },
+                {
+                    name: "PDF Documents",
+                    description: "PDF files that may contain sensitive info",
+                    query: 'site:{DOMAIN} ext:pdf',
+                    category: "Files"
+                },
+                {
+                    name: "Email in Pages",
+                    description: "Pages containing email addresses",
+                    query: 'site:{DOMAIN} intext:"@{DOMAIN}"',
+                    category: "Information"
+                },
+                {
+                    name: "Password in Files",
+                    description: "Files containing password references",
+                    query: 'site:{DOMAIN} intext:"password" | intext:"passwd" | intext:"pwd"',
+                    category: "Credentials"
+                },
+                {
+                    name: "XML Files",
+                    description: "XML configuration and data files",
+                    query: 'site:{DOMAIN} ext:xml | ext:wadl | ext:wsdl',
+                    category: "Files"
+                },
+                {
+                    name: "Register Pages",
+                    description: "User registration endpoints",
+                    query: 'site:{DOMAIN} inurl:register | inurl:signup | inurl:join',
+                    category: "Auth"
+                },
+                {
+                    name: "Reset Password",
+                    description: "Password reset functionality",
+                    query: 'site:{DOMAIN} inurl:reset | inurl:forgot | inurl:recover',
+                    category: "Auth"
+                },
+                {
+                    name: "API Endpoints",
+                    description: "Basic API endpoint discovery",
+                    query: 'site:{DOMAIN} inurl:api | inurl:/v1/ | inurl:/v2/',
+                    category: "API"
+                }
+            ],
+            intermediate: [
+                {
+                    name: "Environment Files",
+                    description: "Laravel/Node.js .env files with credentials",
+                    query: 'site:{DOMAIN} ext:env "DB_PASSWORD" | "DB_USERNAME" | "API_KEY" | "APP_KEY"',
+                    category: "Config"
+                },
+                {
+                    name: "Git Exposure",
+                    description: "Exposed .git directories and files",
+                    query: 'site:{DOMAIN} inurl:"/.git" | "/.git/config" | "/.git/HEAD"',
+                    category: "Exposure"
+                },
+                {
+                    name: "SVN Directories",
+                    description: "Exposed Subversion directories",
+                    query: 'site:{DOMAIN} inurl:".svn/entries" | inurl:".svn/text-base"',
+                    category: "Exposure"
+                },
+                {
+                    name: "Database Errors",
+                    description: "SQL and database error messages",
+                    query: 'site:{DOMAIN} intext:"sql syntax near" | intext:"mysql_fetch" | intext:"PostgreSQL" | intext:"ORA-"',
+                    category: "Error"
+                },
+                {
+                    name: "PHP Errors",
+                    description: "PHP error messages and warnings",
+                    query: 'site:{DOMAIN} "Warning: mysql" | "Warning: include" | "Fatal error" | "Parse error"',
+                    category: "Error"
+                },
+                {
+                    name: "WordPress Vulnerabilities",
+                    description: "WordPress specific files and configs",
+                    query: 'site:{DOMAIN} inurl:wp-content | inurl:wp-includes | inurl:wp-config.php.bak',
+                    category: "CMS"
+                },
+                {
+                    name: "AWS Keys",
+                    description: "Exposed AWS access keys",
+                    query: 'site:{DOMAIN} "AKIA" | "aws_access_key_id" | "aws_secret_access_key"',
+                    category: "Credentials"
+                },
+                {
+                    name: "Google API Keys",
+                    description: "Google Cloud and API keys",
+                    query: 'site:{DOMAIN} "AIza" | "google_api_key" | "gcp"',
+                    category: "Credentials"
+                },
+                {
+                    name: "Private Keys",
+                    description: "SSH and SSL private keys",
+                    query: 'site:{DOMAIN} ext:pem | ext:key | ext:ppk | "BEGIN RSA PRIVATE KEY" | "BEGIN OPENSSH PRIVATE KEY"',
+                    category: "Credentials"
+                },
+                {
+                    name: "SSH Keys",
+                    description: "Exposed SSH authorized_keys and id_rsa",
+                    query: 'site:{DOMAIN} "id_rsa" | "id_dsa" | "authorized_keys"',
+                    category: "Credentials"
+                },
+                {
+                    name: "Jenkins Instances",
+                    description: "Jenkins CI/CD servers",
+                    query: 'site:{DOMAIN} intitle:"Dashboard [Jenkins]" | inurl:"/jenkins/login"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Server Status Pages",
+                    description: "Apache/Nginx status and info pages",
+                    query: 'site:{DOMAIN} inurl:server-status | inurl:status | intitle:"Apache Status"',
+                    category: "Disclosure"
+                },
+                {
+                    name: "Database Dumps",
+                    description: "SQL dump files",
+                    query: 'site:{DOMAIN} inurl:dump.sql | inurl:backup.sql | inurl:database.sql | inurl:db.sql',
+                    category: "Database"
+                },
+                {
+                    name: "Configuration Backups",
+                    description: "Backup copies of config files",
+                    query: 'site:{DOMAIN} inurl:config.bak | inurl:config.php.old | inurl:settings.php.bak',
+                    category: "Config"
+                },
+                {
+                    name: "PHPMyAdmin",
+                    description: "PHPMyAdmin installations",
+                    query: 'site:{DOMAIN} inurl:phpmyadmin | intitle:"phpMyAdmin"',
+                    category: "Database"
+                },
+                {
+                    name: "Adminer",
+                    description: "Adminer database management tool",
+                    query: 'site:{DOMAIN} inurl:adminer.php | intitle:"Adminer"',
+                    category: "Database"
+                },
+                {
+                    name: "FTP Credentials",
+                    description: "FTP configuration files with credentials",
+                    query: 'site:{DOMAIN} filetype:conf inurl:ftp | intext:"ftp://" intext:password',
+                    category: "Credentials"
+                },
+                {
+                    name: "Config in JavaScript",
+                    description: "Configuration data in JS files",
+                    query: 'site:{DOMAIN} ext:js "api_key" | "apikey" | "secret"',
+                    category: "API"
+                },
+                {
+                    name: "WordPress Debug",
+                    description: "WordPress debug mode enabled",
+                    query: 'site:{DOMAIN} inurl:wp-config.php "WP_DEBUG" | "wp-config.txt"',
+                    category: "CMS"
+                },
+                {
+                    name: "Travis CI Secrets",
+                    description: "Travis CI configuration with secrets",
+                    query: 'site:{DOMAIN} ext:yml "travis" "secure:" | ".travis.yml"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Joomla Config",
+                    description: "Joomla configuration files",
+                    query: 'site:{DOMAIN} inurl:configuration.php | "JConfig" | "joomla"',
+                    category: "CMS"
+                },
+                {
+                    name: "Drupal Files",
+                    description: "Drupal sensitive files",
+                    query: 'site:{DOMAIN} inurl:sites/default/files | inurl:settings.php',
+                    category: "CMS"
+                },
+                {
+                    name: "Magento Config",
+                    description: "Magento configuration files",
+                    query: 'site:{DOMAIN} inurl:local.xml | inurl:app/etc/local.xml',
+                    category: "CMS"
+                },
+                {
+                    name: "Credentials in URLs",
+                    description: "Credentials exposed in URL parameters",
+                    query: 'site:{DOMAIN} inurl:password | inurl:token | inurl:secret | inurl:api_key',
+                    category: "Credentials"
+                },
+                {
+                    name: "API Documentation",
+                    description: "Public API documentation pages",
+                    query: 'site:{DOMAIN} intitle:"API Documentation" | inurl:/docs/ | inurl:/api-docs/',
+                    category: "API"
+                }
+            ],
+            advanced: [
+                {
+                    name: "JWT Secrets",
+                    description: "JWT secret keys in configuration files",
+                    query: 'site:{DOMAIN} "jwt_secret" | "jwt.secret" | "jwtSecret" ext:json | ext:yml | ext:yaml | ext:config',
+                    category: "Auth"
+                },
+                {
+                    name: "OAuth Credentials",
+                    description: "OAuth client secrets and tokens",
+                    query: 'site:{DOMAIN} "client_secret" | "client_id" | "oauth_token" | "refresh_token" ext:json | ext:yml',
+                    category: "Auth"
+                },
+                {
+                    name: "Stripe API Keys",
+                    description: "Stripe payment gateway credentials",
+                    query: 'site:{DOMAIN} "sk_live_" | "pk_live_" | "stripe_api_key" | "stripe_secret"',
+                    category: "Payment"
+                },
+                {
+                    name: "PayPal Credentials",
+                    description: "PayPal API credentials",
+                    query: 'site:{DOMAIN} "paypal" intext:"client_id" | intext:"client_secret"',
+                    category: "Payment"
+                },
+                {
+                    name: "Twilio Credentials",
+                    description: "Twilio API keys and auth tokens",
+                    query: 'site:{DOMAIN} "twilio" "auth_token" | "account_sid" | "api_key"',
+                    category: "API"
+                },
+                {
+                    name: "SendGrid API Keys",
+                    description: "SendGrid email service API keys",
+                    query: 'site:{DOMAIN} "SG." | "sendgrid_api_key" | "sendgrid_password"',
+                    category: "API"
+                },
+                {
+                    name: "Mailgun Credentials",
+                    description: "Mailgun API keys",
+                    query: 'site:{DOMAIN} "mailgun_api_key" | "mailgun" "key-"',
+                    category: "API"
+                },
+                {
+                    name: "Docker Configuration",
+                    description: "Docker compose and configuration files",
+                    query: 'site:{DOMAIN} ext:yml "docker-compose" "environment:" "password" | "secret"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Kubernetes Secrets",
+                    description: "Kubernetes config and secrets",
+                    query: 'site:{DOMAIN} ext:yaml "kind: Secret" | "kubectl" | "kubeconfig"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Terraform State",
+                    description: "Terraform state files with infrastructure data",
+                    query: 'site:{DOMAIN} ext:tfstate | ext:tf "resource" "aws" | "azure" | "gcp"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Ansible Vaults",
+                    description: "Ansible configuration and vault files",
+                    query: 'site:{DOMAIN} ext:yml "ansible" "vault" | "ansible_password"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Swagger/OpenAPI",
+                    description: "Swagger/OpenAPI documentation endpoints",
+                    query: 'site:{DOMAIN} inurl:swagger | inurl:api-docs | inurl:openapi.json | inurl:swagger-ui',
+                    category: "API"
+                },
+                {
+                    name: "GraphQL Endpoints",
+                    description: "GraphQL API and introspection",
+                    query: 'site:{DOMAIN} inurl:graphql | inurl:graphiql | intitle:"GraphiQL" | inurl:/v1/graphql',
+                    category: "API"
+                },
+                {
+                    name: "WSDL Files",
+                    description: "SOAP web service definitions",
+                    query: 'site:{DOMAIN} ext:wsdl | inurl:wsdl | "wsdl:definitions"',
+                    category: "API"
+                },
+                {
+                    name: "Elasticsearch Instances",
+                    description: "Exposed Elasticsearch databases",
+                    query: 'site:{DOMAIN} inurl:9200 | inurl:elasticsearch | inurl:_search | inurl:_cluster/health',
+                    category: "Database"
+                },
+                {
+                    name: "MongoDB Exposure",
+                    description: "MongoDB instances and data",
+                    query: 'site:{DOMAIN} inurl:27017 | "mongodb://" | intitle:"mongo express" | inurl:mongo',
+                    category: "Database"
+                },
+                {
+                    name: "Redis Instances",
+                    description: "Redis database instances",
+                    query: 'site:{DOMAIN} inurl:6379 | "redis://" intext:password | inurl:redis',
+                    category: "Database"
+                },
+                {
+                    name: "CouchDB Instances",
+                    description: "CouchDB database exposure",
+                    query: 'site:{DOMAIN} inurl:5984 | inurl:_utils | "Welcome to CouchDB"',
+                    category: "Database"
+                },
+                {
+                    name: "Firebase Databases",
+                    description: "Firebase configuration and databases",
+                    query: 'site:{DOMAIN} "firebaseio.com" | "firebase" intext:"apiKey" | "databaseURL"',
+                    category: "Database"
+                },
+                {
+                    name: "Jira Instances",
+                    description: "Atlassian Jira installations",
+                    query: 'site:{DOMAIN} inurl:jira | intitle:"System Dashboard - Jira" | inurl:browse/',
+                    category: "DevOps"
+                },
+                {
+                    name: "Confluence Instances",
+                    description: "Atlassian Confluence wikis",
+                    query: 'site:{DOMAIN} inurl:confluence | intitle:"Confluence" | inurl:display/',
+                    category: "DevOps"
+                },
+                {
+                    name: "GitLab Instances",
+                    description: "Self-hosted GitLab servers",
+                    query: 'site:{DOMAIN} inurl:gitlab | intitle:"GitLab" | inurl:/explore',
+                    category: "DevOps"
+                },
+                {
+                    name: "Bitbucket Repos",
+                    description: "Bitbucket repository exposure",
+                    query: 'site:{DOMAIN} inurl:bitbucket | intitle:"Bitbucket"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Grafana Dashboards",
+                    description: "Grafana monitoring dashboards",
+                    query: 'site:{DOMAIN} inurl:grafana | intitle:"Grafana" inurl:login | inurl:dashboard',
+                    category: "Monitoring"
+                },
+                {
+                    name: "Kibana Dashboards",
+                    description: "Kibana log analysis dashboards",
+                    query: 'site:{DOMAIN} inurl:kibana | intitle:"Kibana" | inurl:app/kibana',
+                    category: "Monitoring"
+                },
+                {
+                    name: "Prometheus Metrics",
+                    description: "Prometheus monitoring endpoints",
+                    query: 'site:{DOMAIN} inurl:/metrics | inurl:prometheus | "# HELP" | "# TYPE"',
+                    category: "Monitoring"
+                },
+                {
+                    name: "S3 Buckets",
+                    description: "Amazon S3 bucket references",
+                    query: 'site:{DOMAIN} "s3.amazonaws.com" | ".s3.amazonaws.com" | "s3://"',
+                    category: "Cloud"
+                },
+                {
+                    name: "Azure Storage",
+                    description: "Azure storage accounts",
+                    query: 'site:{DOMAIN} "blob.core.windows.net" | "azure" "storage"',
+                    category: "Cloud"
+                },
+                {
+                    name: "Google Cloud Storage",
+                    description: "GCS bucket exposure",
+                    query: 'site:{DOMAIN} "storage.googleapis.com" | "storage.cloud.google.com"',
+                    category: "Cloud"
+                },
+                {
+                    name: "DigitalOcean Spaces",
+                    description: "DigitalOcean object storage",
+                    query: 'site:{DOMAIN} "digitaloceanspaces.com" | "cdn.digitalocean"',
+                    category: "Cloud"
+                },
+                {
+                    name: "SMTP Configuration",
+                    description: "Email server credentials",
+                    query: 'site:{DOMAIN} "smtp_username" | "smtp_password" | "mail_password" | "smtp_host"',
+                    category: "Email"
+                },
+                {
+                    name: "LDAP Credentials",
+                    description: "LDAP authentication credentials",
+                    query: 'site:{DOMAIN} "ldap_password" | "bind_password" | "ldap://" intext:password',
+                    category: "Auth"
+                },
+                {
+                    name: "Slack Webhooks",
+                    description: "Slack webhook URLs and tokens",
+                    query: 'site:{DOMAIN} "hooks.slack.com" | "slack_webhook" | "xoxp-" | "xoxb-"',
+                    category: "Integration"
+                },
+                {
+                    name: "GitHub Tokens",
+                    description: "GitHub personal access tokens",
+                    query: 'site:{DOMAIN} "ghp_" | "gho_" | "github_token" | "gh_token"',
+                    category: "Credentials"
+                },
+                {
+                    name: "NPM Tokens",
+                    description: "NPM registry authentication tokens",
+                    query: 'site:{DOMAIN} "npm_token" | "_authToken" ext:npmrc',
+                    category: "Credentials"
+                },
+                {
+                    name: "Composer Auth",
+                    description: "Composer authentication credentials",
+                    query: 'site:{DOMAIN} "composer.json" "github-oauth" | "http-basic"',
+                    category: "Credentials"
+                },
+                {
+                    name: "Heroku API Keys",
+                    description: "Heroku application keys",
+                    query: 'site:{DOMAIN} "heroku_api_key" | "heroku" "api_key"',
+                    category: "Cloud"
+                },
+                {
+                    name: "Artifactory",
+                    description: "JFrog Artifactory instances",
+                    query: 'site:{DOMAIN} inurl:artifactory | intitle:"Artifactory"',
+                    category: "DevOps"
+                },
+                {
+                    name: "Nexus Repository",
+                    description: "Nexus repository manager",
+                    query: 'site:{DOMAIN} inurl:nexus | intitle:"Nexus Repository Manager"',
+                    category: "DevOps"
+                },
+                {
+                    name: "SonarQube",
+                    description: "SonarQube code analysis platforms",
+                    query: 'site:{DOMAIN} inurl:sonarqube | intitle:"SonarQube"',
+                    category: "DevOps"
+                }
+            ],
+            ghdb: [
+                {
+                    name: "SQL Injection Errors",
+                    description: "Classic GHDB SQL error messages",
+                    query: 'site:{DOMAIN} "You have an error in your SQL syntax" | "Warning: mysql_" | "MySQLSyntaxErrorException"',
+                    category: "GHDB-Vuln"
+                },
+                {
+                    name: "Directory Traversal",
+                    description: "Potential directory traversal vulnerabilities",
+                    query: 'site:{DOMAIN} inurl:"file=" | inurl:"path=" | inurl:"folder=" | inurl:"dir="',
+                    category: "GHDB-Vuln"
+                },
+                {
+                    name: "File Inclusion",
+                    description: "Potential LFI/RFI vulnerabilities",
+                    query: 'site:{DOMAIN} inurl:"include=" | inurl:"page=" | inurl:"module=" ext:php',
+                    category: "GHDB-Vuln"
+                },
+                {
+                    name: "Open Redirects",
+                    description: "Potential open redirect parameters",
+                    query: 'site:{DOMAIN} inurl:"redirect=" | inurl:"url=" | inurl:"return=" | inurl:"next="',
+                    category: "GHDB-Vuln"
+                },
+                {
+                    name: "Webcam Access",
+                    description: "Publicly accessible webcams and CCTV",
+                    query: 'site:{DOMAIN} intitle:"webcam" | intitle:"network camera" | inurl:view/index.shtml',
+                    category: "GHDB-Device"
+                },
+                {
+                    name: "Network Devices",
+                    description: "Router and network device interfaces",
+                    query: 'site:{DOMAIN} intitle:"RouterOS" | intitle:"pfSense" | intitle:"DD-WRT"',
+                    category: "GHDB-Device"
+                },
+                {
+                    name: "VPN Portals",
+                    description: "VPN login portals",
+                    query: 'site:{DOMAIN} intitle:"VPN" | inurl:"/vpn/" | intitle:"Fortinet" | intitle:"Cisco AnyConnect"',
+                    category: "GHDB-Access"
+                },
+                {
+                    name: "Citrix Gateway",
+                    description: "Citrix access gateways",
+                    query: 'site:{DOMAIN} intitle:"Citrix" | inurl:"/vpn/index.html" | "Citrix Gateway"',
+                    category: "GHDB-Access"
+                },
+                {
+                    name: "Microsoft Exchange",
+                    description: "Exchange webmail and admin interfaces",
+                    query: 'site:{DOMAIN} inurl:"/owa/" | inurl:"/ecp/" | intitle:"Outlook Web App"',
+                    category: "GHDB-Email"
+                },
+                {
+                    name: "RoundCube Webmail",
+                    description: "RoundCube email interfaces",
+                    query: 'site:{DOMAIN} intitle:"Roundcube Webmail" | inurl:"/roundcube/"',
+                    category: "GHDB-Email"
+                },
+                {
+                    name: "Zimbra Webmail",
+                    description: "Zimbra email server interfaces",
+                    query: 'site:{DOMAIN} intitle:"Zimbra" | inurl:"/zimbra/"',
+                    category: "GHDB-Email"
+                },
+                {
+                    name: "cPanel Login",
+                    description: "cPanel hosting control panel",
+                    query: 'site:{DOMAIN} inurl:"/cpanel" | inurl:":2082" | intitle:"cPanel"',
+                    category: "GHDB-Admin"
+                },
+                {
+                    name: "Plesk Panel",
+                    description: "Plesk hosting control panel",
+                    query: 'site:{DOMAIN} inurl:":8443" | intitle:"Plesk" | inurl:"/plesk/"',
+                    category: "GHDB-Admin"
+                },
+                {
+                    name: "WHM/cPanel",
+                    description: "Web Host Manager interfaces",
+                    query: 'site:{DOMAIN} inurl:"/whm" | inurl:":2087" | intitle:"WHM"',
+                    category: "GHDB-Admin"
+                },
+                {
+                    name: "Default Credentials",
+                    description: "Pages mentioning default passwords",
+                    query: 'site:{DOMAIN} intext:"default password" | intext:"default username"',
+                    category: "GHDB-Creds"
+                },
+                {
+                    name: "Test Credentials",
+                    description: "Test accounts and credentials",
+                    query: 'site:{DOMAIN} intext:"test password" | intext:"test account" | inurl:test',
+                    category: "GHDB-Creds"
+                },
+                {
+                    name: "Database Credentials",
+                    description: "Database connection strings",
+                    query: 'site:{DOMAIN} "Server=" | "Data Source=" | "Initial Catalog=" "Password="',
+                    category: "GHDB-Creds"
+                },
+                {
+                    name: "FTP Servers",
+                    description: "FTP server listings",
+                    query: 'site:{DOMAIN} intitle:"Index of" inurl:ftp | intitle:"FTP root at"',
+                    category: "GHDB-Files"
+                },
+                {
+                    name: "Network Share Files",
+                    description: "Windows network share exposures",
+                    query: 'site:{DOMAIN} "Index of" "Parent Directory" SMB | CIFS',
+                    category: "GHDB-Files"
+                },
+                {
+                    name: "Subversion Repos",
+                    description: "SVN repository listings",
+                    query: 'site:{DOMAIN} intitle:"Index of" ".svn" | "Revision"',
+                    category: "GHDB-Files"
+                },
+                {
+                    name: "Publicly Listed Users",
+                    description: "Employee directories and user listings",
+                    query: 'site:{DOMAIN} intitle:"directory" | intitle:"employee" | intitle:"staff"',
+                    category: "GHDB-Info"
+                },
+                {
+                    name: "Financial Data",
+                    description: "Financial documents and reports",
+                    query: 'site:{DOMAIN} ext:xls | ext:xlsx "invoice" | "payment" | "salary" | "budget"',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "Social Security Numbers",
+                    description: "Documents potentially containing SSNs",
+                    query: 'site:{DOMAIN} ext:pdf | ext:doc "SSN" | "social security"',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "Medical Records",
+                    description: "Healthcare and medical information",
+                    query: 'site:{DOMAIN} "patient" | "medical record" | "diagnosis" ext:pdf | ext:doc',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "Legal Documents",
+                    description: "Contracts and legal agreements",
+                    query: 'site:{DOMAIN} ext:pdf "confidential" | "privileged" | "attorney"',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "HR Documents",
+                    description: "Human resources documents",
+                    query: 'site:{DOMAIN} ext:doc | ext:pdf "resume" | "CV" | "application"',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "NDA Documents",
+                    description: "Non-disclosure agreements",
+                    query: 'site:{DOMAIN} ext:pdf | ext:doc "NDA" | "non-disclosure"',
+                    category: "GHDB-Sensitive"
+                },
+                {
+                    name: "Meeting Notes",
+                    description: "Internal meeting notes and minutes",
+                    query: 'site:{DOMAIN} ext:doc | ext:pdf "meeting notes" | "minutes" "confidential"',
+                    category: "GHDB-Info"
+                },
+                {
+                    name: "Sharepoint Sites",
+                    description: "Microsoft Sharepoint installations",
+                    query: 'site:{DOMAIN} inurl:"/_layouts/" | intitle:"Site Contents"',
+                    category: "GHDB-Collab"
+                },
+                {
+                    name: "Internal Presentations",
+                    description: "PowerPoint and presentation files",
+                    query: 'site:{DOMAIN} ext:ppt | ext:pptx "internal" | "confidential"',
+                    category: "GHDB-Info"
+                },
+                {
+                    name: "Unprotected Admin",
+                    description: "Admin pages without authentication",
+                    query: 'site:{DOMAIN} intitle:"admin" -inurl:login -inurl:signin',
+                    category: "GHDB-Admin"
+                },
+                {
+                    name: "Error Pages",
+                    description: "Error pages revealing information",
+                    query: 'site:{DOMAIN} intitle:"error" | intitle:"exception" | intitle:"failure"',
+                    category: "GHDB-Error"
+                },
+                {
+                    name: "Source Code",
+                    description: "Exposed source code files",
+                    query: 'site:{DOMAIN} ext:java | ext:py | ext:cpp | ext:c | ext:rb',
+                    category: "GHDB-Files"
+                },
+                {
+                    name: "Credentials in Logs",
+                    description: "Credentials appearing in log files",
+                    query: 'site:{DOMAIN} ext:log "password" | "username" | "admin"',
+                    category: "GHDB-Creds"
+                },
+                {
+                    name: "Email Lists",
+                    description: "Lists of email addresses",
+                    query: 'site:{DOMAIN} ext:csv | ext:txt intext:"@" | "email"',
+                    category: "GHDB-Info"
+                },
+                {
+                    name: "Passwords in Excel",
+                    description: "Password lists in spreadsheets",
+                    query: 'site:{DOMAIN} ext:xls | ext:xlsx "password" | "username"',
+                    category: "GHDB-Creds"
+                },
+                {
+                    name: "VNC Servers",
+                    description: "VNC remote desktop instances",
+                    query: 'site:{DOMAIN} intitle:"VNC Viewer" | inurl:":5900" | inurl:":5901"',
+                    category: "GHDB-Device"
+                },
+                {
+                    name: "RDP Web Access",
+                    description: "Remote Desktop web gateways",
+                    query: 'site:{DOMAIN} intitle:"Remote Desktop" | inurl:"/rdweb/"',
+                    category: "GHDB-Access"
+                },
+                {
+                    name: "Exposed Printers",
+                    description: "Network printer web interfaces",
+                    query: 'site:{DOMAIN} intitle:"printer" | inurl:":631" | "HP LaserJet"',
+                    category: "GHDB-Device"
+                },
+                {
+                    name: "IoT Devices",
+                    description: "Internet of Things device interfaces",
+                    query: 'site:{DOMAIN} intitle:"IoT" | inurl:":8080" | "smart device"',
+                    category: "GHDB-Device"
+                },
+                {
+                    name: "Backup Scripts",
+                    description: "Automated backup scripts",
+                    query: 'site:{DOMAIN} ext:sh | ext:bat | ext:ps1 "backup"',
+                    category: "GHDB-Files"
+                },
+                {
+                    name: "Installation Scripts",
+                    description: "Installation and setup scripts",
+                    query: 'site:{DOMAIN} ext:sh | ext:bat "install" | "setup"',
+                    category: "GHDB-Files"
+                }
+            ]
+        };
+
+        const searchEngines = {
+            google: 'https://www.google.com/search?q=',
+            bing: 'https://www.bing.com/search?q=',
+            duckduckgo: 'https://duckduckgo.com/?q=',
+            yahoo: 'https://search.yahoo.com/search?p=',
+            yandex: 'https://yandex.com/search/?text=',
+            baidu: 'https://www.baidu.com/s?wd=',
+            brave: 'https://search.brave.com/search?q=',
+            startpage: 'https://www.startpage.com/do/search?q=',
+            qwant: 'https://www.qwant.com/?q=',
+            ecosia: 'https://www.ecosia.org/search?q=',
+            ask: 'https://www.ask.com/web?q=',
+            searx: 'https://searx.be/search?q='
+        };
+
+        let selectedEngine = 'google';
+        let activeSection = 'recon';
+
+        function initializeApp() {
+            renderNavigation();
+            renderAllSections();
+            updateStats();
+            setupEventListeners();
+            showSection('recon');
+        }
+
+        function renderNavigation() {
+            const nav = document.getElementById('sectionNav');
+            const sections = [
+                { id: 'recon', label: 'Recon' },
+                { id: 'ez', label: 'Easy' },
+                { id: 'intermediate', label: 'Intermediate' },
+                { id: 'advanced', label: 'Advanced' },
+                { id: 'ghdb', label: 'GHDB' }
+            ];
+
+            sections.forEach(section => {
+                const btn = document.createElement('button');
+                btn.className = 'nav-btn';
+                btn.textContent = section.label;
+                btn.onclick = () => showSection(section.id);
+                btn.dataset.section = section.id;
+                nav.appendChild(btn);
+            });
+        }
+
+        function showSection(sectionId) {
+            activeSection = sectionId;
+            
+            document.querySelectorAll('.dork-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(`section-${sectionId}`).classList.add('active');
+
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            document.querySelector(`.nav-btn[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        function renderAllSections() {
+            const container = document.getElementById('dorksContainer');
+            
+            Object.keys(dorks).forEach(category => {
+                const section = document.createElement('div');
+                section.className = 'dork-section';
+                section.id = `section-${category}`;
+                
+                const categoryName = category === 'recon' ? 'Reconnaissance & Info Gathering' :
+                                     category === 'ez' ? 'Easy' : 
+                                     category === 'intermediate' ? 'Intermediate' : 
+                                     category === 'advanced' ? 'Advanced' : 'GHDB';
+                
+                let infoBox = '';
+                if (category === 'recon') {
+                    infoBox = `
+                        <div class="info-box">
+                            <strong>Reconnaissance Section</strong>
+                            This section focuses on information gathering, parameter discovery, path enumeration, 
+                            and endpoint mapping. Perfect for initial recon phase of bug bounty hunting.
+                        </div>
+                    `;
+                }
+                
+                section.innerHTML = `
+                    ${infoBox}
+                    <div class="section-header">
+                        <h2 class="section-title">
+                            ${categoryName}
+                            ${category === 'ghdb' ? '<span class="badge">GHDB</span>' : ''}
+                        </h2>
+                        <span class="section-count">${dorks[category].length} dorks</span>
+                    </div>
+                    <div class="dorks-list" id="${category}-list"></div>
+                    <div class="action-bar">
+                        <button class="action-btn" onclick="launchAllDorks('${category}')">
+                            Launch All ${categoryName} Dorks
+                        </button>
+                    </div>
+                `;
+                
+                container.appendChild(section);
+                
+                const list = document.getElementById(`${category}-list`);
+                dorks[category].forEach(dork => {
+                    const dorkElement = createDorkElement(dork, category);
+                    list.appendChild(dorkElement);
+                });
+            });
+        }
+
+        function createDorkElement(dork, category) {
+            const div = document.createElement('div');
+            div.className = 'dork-item';
+            div.onclick = () => launchDork(dork);
+            
+            div.innerHTML = `
+                <div class="dork-header">
+                    <div class="dork-name">${dork.name}</div>
+                    <div class="dork-category">${dork.category || category}</div>
+                </div>
+                <div class="dork-description">${dork.description}</div>
+                <div class="dork-query">${dork.query}</div>
+            `;
+            
+            return div;
+        }
+
+        function launchDork(dork) {
+            const domain = document.getElementById('targetDomain').value.trim();
+            
+            if (!domain) {
+                alert('Enter a target domain first');
+                document.getElementById('targetDomain').focus();
+                return;
+            }
+            
+            const query = dork.query.replace(/{DOMAIN}/g, domain);
+            const url = searchEngines[selectedEngine] + encodeURIComponent(query);
+            
+            window.open(url, '_blank');
+        }
+
+        function launchAllDorks(category) {
+            const domain = document.getElementById('targetDomain').value.trim();
+            
+            if (!domain) {
+                alert('Enter a target domain first');
+                document.getElementById('targetDomain').focus();
+                return;
+            }
+            
+            const categoryName = category === 'recon' ? 'Reconnaissance' :
+                                category === 'ez' ? 'Easy' : 
+                                category === 'intermediate' ? 'Intermediate' : 
+                                category === 'advanced' ? 'Advanced' : 'GHDB';
+            
+            const confirmation = confirm(
+                `Launch ${dorks[category].length} ${categoryName} dorks?\n\n` +
+                `Target: ${domain}\n` +
+                `Engine: ${selectedEngine}\n\n` +
+                `This will open multiple tabs.`
+            );
+            
+            if (!confirmation) return;
+            
+            dorks[category].forEach((dork, index) => {
+                setTimeout(() => {
+                    launchDork(dork);
+                }, index * 400);
+            });
+        }
+
+        function updateStats() {
+            const reconCount = dorks.recon.length;
+            const ezCount = dorks.ez.length;
+            const intCount = dorks.intermediate.length;
+            const advCount = dorks.advanced.length;
+            const ghdbCount = dorks.ghdb.length;
+            const totalCount = reconCount + ezCount + intCount + advCount + ghdbCount;
+            
+            document.getElementById('totalDorks').textContent = totalCount;
+            document.getElementById('reconCount').textContent = reconCount;
+            document.getElementById('ezCount').textContent = ezCount;
+            document.getElementById('intCount').textContent = intCount;
+            document.getElementById('advCount').textContent = advCount;
+            document.getElementById('ghdbCount').textContent = ghdbCount;
+        }
+
+        function setupEventListeners() {
+            document.querySelectorAll('.engine-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.engine-btn').forEach(b => b.classList.remove('active'));
+                    this.classList.add('active');
+                    selectedEngine = this.dataset.engine;
+                });
+            });
+
+            document.getElementById('targetDomain').addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    const firstDork = dorks[activeSection][0];
+                    launchDork(firstDork);
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', initializeApp);
+    </script>
+</body>
+</html>
