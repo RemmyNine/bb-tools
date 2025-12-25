@@ -1,2 +1,1 @@
-# wordlists
-This repo contains wordlist gathered from bug bounty programs, crawling, swagger and javascript sources.
+This Repo Contain all things I Might use in BB
